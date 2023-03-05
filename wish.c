@@ -9,6 +9,7 @@ int prompt();
 int prompt() {
   //prompts the user for a command. Parses it, and then executes it
   char* buffer;
+  char exit_code[] = "exit";
   size_t lim = 256;
   size_t characters;
   printf("wish> ");
@@ -16,6 +17,7 @@ int prompt() {
   
   characters = getline(&buffer,&lim,stdin);
 
+  
   char* delim = " \n";
   char* in_argv[10];
   int i = 1;
@@ -23,10 +25,14 @@ int prompt() {
   while ((in_argv[i] = strtok(NULL,delim))!=NULL){
     i++;
     if (i == 10) {
-      return -2; //too many args
+      return -3;
     }
   }
 
+  if (strcmp(in_argv[0],exit_code)==0){
+    return -2;
+  }
+    
   //find the path that contains our command
   char exec_path[100];
   char* search_path;
@@ -53,10 +59,17 @@ int prompt() {
     wait(NULL);
     return 0;
   }
+
 }
 
 int main() {
-  int returncode = prompt();
-  printf("%d\n",returncode);
+
+  //prompt has several return codes specified here:
+  //0 - user entered a command that executed successfully
+  //-1 - user entered a command that could not be found
+  //-2 - user made exit command. Abort program
+  int returncode;
+  while ((returncode = prompt())!=-2) {;}
+  
   return 0;
 }
