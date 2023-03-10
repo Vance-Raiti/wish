@@ -63,13 +63,14 @@ int prompt() {
     int pids[n_cmd];
 
     char multi_delim[] = "&";
-    char* tok = strtok(buffer,multi_delim);
+    char* context;
+    char* tok = strtok_r(buffer,multi_delim,&context);
     i = 0;
 
     while (tok != NULL){
       char* cmd = strdup(tok);
       pids[i++] = parse_cmd(cmd);
-      tok = strtok(NULL,multi_delim);
+      tok = strtok_r(NULL,multi_delim,&context);
     }
     
     i = 0;
@@ -118,6 +119,10 @@ int execute(int argc, char** argv){
     char* path_cpy = strdup(path); //we don't want to add null characters into the path
     //so we copy it in order to perform parsing
     search_path = strtok(path_cpy," ");
+    if (search_path==NULL) {
+      print_err();
+      return -1;
+    }
     do {
         strcpy(exec_path,search_path);
         strcat(exec_path,"/");
